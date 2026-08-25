@@ -1,58 +1,47 @@
-// Required function 1
+// Calculates the amount for one product.
 function calculateItemAmount(price, quantity) {
     return price * quantity;
 }
 
 
-// Required function 2
+// Calculates the discount amount based on the subtotal.
 function calculateDiscount(subtotal) {
-    let discountRate;
-
     if (subtotal >= 5000) {
-        discountRate = 0.10;
+        return subtotal * 0.10;
     } else if (subtotal >= 3000) {
-        discountRate = 0.07;
+        return subtotal * 0.07;
     } else if (subtotal >= 1000) {
-        discountRate = 0.05;
+        return subtotal * 0.05;
     } else {
-        discountRate = 0;
+        return 0;
     }
-
-    return subtotal * discountRate;
 }
 
 
-// Required function 3
+// Determines the delivery fee using a switch statement.
 function getDeliveryFee(option) {
-    let fee;
-
     switch (option) {
         case "1":
-            fee = 0;
-            break;
+            return 0;
 
         case "2":
-            fee = 80;
-            break;
+            return 80;
 
         case "3":
-            fee = 150;
-            break;
+            return 150;
 
         default:
-            fee = 0;
+            return 0;
     }
-
-    return fee;
 }
 
 
-// Get HTML elements
+// Get the product count input and product container.
 const productCountInput = document.getElementById("productCount");
 const productsContainer = document.getElementById("productsContainer");
 
 
-// Generate product inputs using a for loop
+// Generate product input fields.
 productCountInput.addEventListener("input", function () {
 
     const productCount = Number(productCountInput.value);
@@ -88,7 +77,7 @@ productCountInput.addEventListener("input", function () {
 });
 
 
-// Calculate order when button is clicked
+// Calculate the order when the button is clicked.
 document.getElementById("calculateBtn").addEventListener("click", function () {
 
     const customerName = document.getElementById("customerName").value.trim();
@@ -98,21 +87,21 @@ document.getElementById("calculateBtn").addEventListener("click", function () {
     const validationMessage = document.getElementById("validationMessage");
     const orderSummary = document.getElementById("orderSummary");
 
-    // Clear previous messages
     validationMessage.textContent = "";
     orderSummary.innerHTML = "";
 
 
-    // Validate customer name
+    // Validate customer name.
     if (customerName === "") {
         validationMessage.textContent = "Please enter the Customer Name.";
         return;
     }
 
 
-    // Validate product count
+    // Validate product count.
     if (!Number.isInteger(productCount) || productCount <= 0) {
-        validationMessage.textContent = "Please enter a valid positive Number of Products.";
+        validationMessage.textContent =
+            "Please enter a valid positive number for Number of Products.";
         return;
     }
 
@@ -121,15 +110,20 @@ document.getElementById("calculateBtn").addEventListener("click", function () {
     let productsOutput = "";
 
 
-    // Process products using the required for loop
+    // Process every product using a for loop.
     for (let i = 0; i < productCount; i++) {
 
-        const productName = document.getElementById(`productName-${i}`).value.trim();
-        const price = Number(document.getElementById(`productPrice-${i}`).value);
-        const quantity = Number(document.getElementById(`productQuantity-${i}`).value);
+        const productName =
+            document.getElementById(`productName-${i}`).value.trim();
+
+        const price =
+            Number(document.getElementById(`productPrice-${i}`).value);
+
+        const quantity =
+            Number(document.getElementById(`productQuantity-${i}`).value);
 
 
-        // Validate product name
+        // Validate product name.
         if (productName === "") {
             validationMessage.textContent =
                 `Please enter the Product Name for Product ${i + 1}.`;
@@ -137,7 +131,7 @@ document.getElementById("calculateBtn").addEventListener("click", function () {
         }
 
 
-        // Validate price
+        // Validate price.
         if (!Number.isFinite(price) || price <= 0) {
             validationMessage.textContent =
                 `Please enter a valid positive Price for Product ${i + 1}.`;
@@ -145,23 +139,26 @@ document.getElementById("calculateBtn").addEventListener("click", function () {
         }
 
 
-        // Validate quantity
-        if (!Number.isFinite(quantity) || quantity <= 0 || !Number.isInteger(quantity)) {
+        // Validate quantity.
+        if (!Number.isFinite(quantity) ||
+            quantity <= 0 ||
+            !Number.isInteger(quantity)) {
+
             validationMessage.textContent =
                 `Please enter a valid positive Quantity for Product ${i + 1}.`;
             return;
         }
 
 
-        // Calculate item amount
+        // Calculate the amount for the product.
         const itemAmount = calculateItemAmount(price, quantity);
 
 
-        // Accumulator
+        // Add the item amount to the subtotal accumulator.
         subtotal += itemAmount;
 
 
-        // Build product output
+        // Build the product details.
         productsOutput += `
             <p>
                 <strong>${i + 1}. ${productName}</strong><br>
@@ -173,11 +170,11 @@ document.getElementById("calculateBtn").addEventListener("click", function () {
     }
 
 
-    // Calculate discount
+    // Calculate the discount.
     const discount = calculateDiscount(subtotal);
 
 
-    // Determine discount rate for display
+    // Determine the discount rate for display.
     let discountRate;
 
     if (subtotal >= 5000) {
@@ -191,36 +188,27 @@ document.getElementById("calculateBtn").addEventListener("click", function () {
     }
 
 
-    // Calculate delivery fee
+    // Calculate the delivery fee.
     const deliveryFee = getDeliveryFee(deliveryOption);
 
 
-    // Determine delivery type
+    // Determine the delivery type for the order summary.
     let deliveryType;
 
-    switch (deliveryOption) {
-        case "1":
-            deliveryType = "Store Pickup";
-            break;
-
-        case "2":
-            deliveryType = "Standard Delivery";
-            break;
-
-        case "3":
-            deliveryType = "Express Delivery";
-            break;
-
-        default:
-            deliveryType = "Store Pickup";
+    if (deliveryOption === "1") {
+        deliveryType = "Store Pickup";
+    } else if (deliveryOption === "2") {
+        deliveryType = "Standard Delivery";
+    } else {
+        deliveryType = "Express Delivery";
     }
 
 
-    // Final amount
+    // Calculate the final amount.
     const finalAmount = subtotal - discount + deliveryFee;
 
 
-    // Display complete order summary
+    // Display the complete order summary.
     orderSummary.innerHTML = `
         <h2>MINI STORE CHECKOUT SYSTEM</h2>
 
