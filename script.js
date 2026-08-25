@@ -39,7 +39,7 @@ function getDeliveryFee(option) {
 }
 
 
-// Export the required functions when running under Node.js.
+// Allow the required functions to be tested by Node.js.
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         calculateItemAmount,
@@ -135,6 +135,7 @@ if (typeof document !== "undefined") {
             document.getElementById("orderSummary");
 
 
+        // Clear previous messages.
         validationMessage.textContent = "";
         orderSummary.innerHTML = "";
 
@@ -174,6 +175,7 @@ if (typeof document !== "undefined") {
                 document.getElementById(`productQuantity-${i}`);
 
 
+            // Validate that product fields exist.
             if (!productNameElement ||
                 !productPriceElement ||
                 !productQuantityElement) {
@@ -214,8 +216,7 @@ if (typeof document !== "undefined") {
 
             // Validate quantity.
             if (!Number.isFinite(quantity) ||
-                quantity <= 0 ||
-                !Number.isInteger(quantity)) {
+                quantity <= 0) {
 
                 validationMessage.textContent =
                     `Please enter a valid positive Quantity for Product ${i + 1}.`;
@@ -228,7 +229,7 @@ if (typeof document !== "undefined") {
                 calculateItemAmount(price, quantity);
 
 
-            // Accumulator.
+            // Add item amount to subtotal.
             subtotal += itemAmount;
 
 
@@ -249,7 +250,7 @@ if (typeof document !== "undefined") {
             calculateDiscount(subtotal);
 
 
-        // Determine discount rate.
+        // Determine discount rate for display.
         let discountRate;
 
         if (subtotal >= 5000) {
@@ -275,8 +276,10 @@ if (typeof document !== "undefined") {
             deliveryType = "Store Pickup";
         } else if (deliveryOption === "2") {
             deliveryType = "Standard Delivery";
-        } else {
+        } else if (deliveryOption === "3") {
             deliveryType = "Express Delivery";
+        } else {
+            deliveryType = "Unknown";
         }
 
 
