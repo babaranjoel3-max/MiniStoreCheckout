@@ -21,12 +21,15 @@ function calculateDiscount(subtotal) {
 // Determines the delivery fee using a switch statement.
 function getDeliveryFee(option) {
     switch (option) {
+        case 1:
         case "1":
             return 0;
 
+        case 2:
         case "2":
             return 80;
 
+        case 3:
         case "3":
             return 150;
 
@@ -36,7 +39,17 @@ function getDeliveryFee(option) {
 }
 
 
-// Browser/DOM code
+// Export the required functions when running under Node.js.
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        calculateItemAmount,
+        calculateDiscount,
+        getDeliveryFee
+    };
+}
+
+
+// Browser/DOM code.
 if (typeof document !== "undefined") {
 
     const productCountInput =
@@ -122,7 +135,6 @@ if (typeof document !== "undefined") {
             document.getElementById("orderSummary");
 
 
-        // Clear previous messages.
         validationMessage.textContent = "";
         orderSummary.innerHTML = "";
 
@@ -162,7 +174,6 @@ if (typeof document !== "undefined") {
                 document.getElementById(`productQuantity-${i}`);
 
 
-            // Validate that product fields exist.
             if (!productNameElement ||
                 !productPriceElement ||
                 !productQuantityElement) {
@@ -217,7 +228,7 @@ if (typeof document !== "undefined") {
                 calculateItemAmount(price, quantity);
 
 
-            // Add item amount to subtotal.
+            // Accumulator.
             subtotal += itemAmount;
 
 
@@ -238,7 +249,7 @@ if (typeof document !== "undefined") {
             calculateDiscount(subtotal);
 
 
-        // Determine discount rate for display.
+        // Determine discount rate.
         let discountRate;
 
         if (subtotal >= 5000) {
