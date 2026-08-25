@@ -36,197 +36,264 @@ function getDeliveryFee(option) {
 }
 
 
-// Get the product count input and product container.
-const productCountInput = document.getElementById("productCount");
-const productsContainer = document.getElementById("productsContainer");
+// Browser/DOM code
+if (typeof document !== "undefined") {
+
+    const productCountInput =
+        document.getElementById("productCount");
+
+    const productsContainer =
+        document.getElementById("productsContainer");
+
+    const calculateBtn =
+        document.getElementById("calculateBtn");
 
 
-// Generate product input fields.
-productCountInput.addEventListener("input", function () {
+    // Generate product input fields using a for loop.
+    productCountInput.addEventListener("input", function () {
 
-    const productCount = Number(productCountInput.value);
+        const productCount =
+            Number(productCountInput.value);
 
-    productsContainer.innerHTML = "";
+        productsContainer.innerHTML = "";
 
-    if (productCount > 0 && Number.isInteger(productCount)) {
+        if (productCount > 0 &&
+            Number.isInteger(productCount)) {
 
+            for (let i = 0; i < productCount; i++) {
+
+                productsContainer.innerHTML += `
+                    <div>
+                        <h3>Product ${i + 1}</h3>
+
+                        <label for="productName-${i}">
+                            Product Name
+                        </label>
+                        <input
+                            type="text"
+                            id="productName-${i}"
+                        >
+
+                        <br>
+
+                        <label for="productPrice-${i}">
+                            Price
+                        </label>
+                        <input
+                            type="number"
+                            id="productPrice-${i}"
+                            step="0.01"
+                        >
+
+                        <br>
+
+                        <label for="productQuantity-${i}">
+                            Quantity
+                        </label>
+                        <input
+                            type="number"
+                            id="productQuantity-${i}"
+                        >
+
+                        <br><br>
+                    </div>
+                `;
+            }
+        }
+    });
+
+
+    // Calculate the order when the button is clicked.
+    calculateBtn.addEventListener("click", function () {
+
+        const customerName =
+            document.getElementById("customerName").value.trim();
+
+        const productCount =
+            Number(productCountInput.value);
+
+        const deliveryOption =
+            document.getElementById("deliveryOption").value;
+
+        const validationMessage =
+            document.getElementById("validationMessage");
+
+        const orderSummary =
+            document.getElementById("orderSummary");
+
+
+        // Clear previous messages.
+        validationMessage.textContent = "";
+        orderSummary.innerHTML = "";
+
+
+        // Validate customer name.
+        if (customerName === "") {
+            validationMessage.textContent =
+                "Please enter the Customer Name.";
+            return;
+        }
+
+
+        // Validate product count.
+        if (!Number.isInteger(productCount) ||
+            productCount <= 0) {
+
+            validationMessage.textContent =
+                "Please enter a valid positive number for Number of Products.";
+            return;
+        }
+
+
+        let subtotal = 0;
+        let productsOutput = "";
+
+
+        // Process each product using a for loop.
         for (let i = 0; i < productCount; i++) {
 
-            productsContainer.innerHTML += `
-                <div>
-                    <h3>Product ${i + 1}</h3>
+            const productNameElement =
+                document.getElementById(`productName-${i}`);
 
-                    <label for="productName-${i}">Product Name</label>
-                    <input type="text" id="productName-${i}">
+            const productPriceElement =
+                document.getElementById(`productPrice-${i}`);
 
-                    <br>
+            const productQuantityElement =
+                document.getElementById(`productQuantity-${i}`);
 
-                    <label for="productPrice-${i}">Price</label>
-                    <input type="number" id="productPrice-${i}" step="0.01">
 
-                    <br>
+            // Validate that product fields exist.
+            if (!productNameElement ||
+                !productPriceElement ||
+                !productQuantityElement) {
 
-                    <label for="productQuantity-${i}">Quantity</label>
-                    <input type="number" id="productQuantity-${i}">
+                validationMessage.textContent =
+                    "Please enter all product information.";
+                return;
+            }
 
-                    <br><br>
-                </div>
+
+            const productName =
+                productNameElement.value.trim();
+
+            const price =
+                Number(productPriceElement.value);
+
+            const quantity =
+                Number(productQuantityElement.value);
+
+
+            // Validate product name.
+            if (productName === "") {
+                validationMessage.textContent =
+                    `Please enter the Product Name for Product ${i + 1}.`;
+                return;
+            }
+
+
+            // Validate price.
+            if (!Number.isFinite(price) ||
+                price <= 0) {
+
+                validationMessage.textContent =
+                    `Please enter a valid positive Price for Product ${i + 1}.`;
+                return;
+            }
+
+
+            // Validate quantity.
+            if (!Number.isFinite(quantity) ||
+                quantity <= 0 ||
+                !Number.isInteger(quantity)) {
+
+                validationMessage.textContent =
+                    `Please enter a valid positive Quantity for Product ${i + 1}.`;
+                return;
+            }
+
+
+            // Calculate item amount.
+            const itemAmount =
+                calculateItemAmount(price, quantity);
+
+
+            // Add item amount to subtotal.
+            subtotal += itemAmount;
+
+
+            // Build product details.
+            productsOutput += `
+                <p>
+                    <strong>${i + 1}. ${productName}</strong><br>
+                    Price: ₱${price.toFixed(2)}<br>
+                    Quantity: ${quantity}<br>
+                    Amount: ₱${itemAmount.toFixed(2)}
+                </p>
             `;
         }
-    }
-});
 
 
-// Calculate the order when the button is clicked.
-document.getElementById("calculateBtn").addEventListener("click", function () {
-
-    const customerName = document.getElementById("customerName").value.trim();
-    const productCount = Number(productCountInput.value);
-    const deliveryOption = document.getElementById("deliveryOption").value;
-
-    const validationMessage = document.getElementById("validationMessage");
-    const orderSummary = document.getElementById("orderSummary");
-
-    validationMessage.textContent = "";
-    orderSummary.innerHTML = "";
+        // Calculate discount.
+        const discount =
+            calculateDiscount(subtotal);
 
 
-    // Validate customer name.
-    if (customerName === "") {
-        validationMessage.textContent = "Please enter the Customer Name.";
-        return;
-    }
+        // Determine discount rate for display.
+        let discountRate;
 
-
-    // Validate product count.
-    if (!Number.isInteger(productCount) || productCount <= 0) {
-        validationMessage.textContent =
-            "Please enter a valid positive number for Number of Products.";
-        return;
-    }
-
-
-    let subtotal = 0;
-    let productsOutput = "";
-
-
-    // Process every product using a for loop.
-    for (let i = 0; i < productCount; i++) {
-
-        const productName =
-            document.getElementById(`productName-${i}`).value.trim();
-
-        const price =
-            Number(document.getElementById(`productPrice-${i}`).value);
-
-        const quantity =
-            Number(document.getElementById(`productQuantity-${i}`).value);
-
-
-        // Validate product name.
-        if (productName === "") {
-            validationMessage.textContent =
-                `Please enter the Product Name for Product ${i + 1}.`;
-            return;
+        if (subtotal >= 5000) {
+            discountRate = 10;
+        } else if (subtotal >= 3000) {
+            discountRate = 7;
+        } else if (subtotal >= 1000) {
+            discountRate = 5;
+        } else {
+            discountRate = 0;
         }
 
 
-        // Validate price.
-        if (!Number.isFinite(price) || price <= 0) {
-            validationMessage.textContent =
-                `Please enter a valid positive Price for Product ${i + 1}.`;
-            return;
+        // Calculate delivery fee.
+        const deliveryFee =
+            getDeliveryFee(deliveryOption);
+
+
+        // Determine delivery type.
+        let deliveryType;
+
+        if (deliveryOption === "1") {
+            deliveryType = "Store Pickup";
+        } else if (deliveryOption === "2") {
+            deliveryType = "Standard Delivery";
+        } else {
+            deliveryType = "Express Delivery";
         }
 
 
-        // Validate quantity.
-        if (!Number.isFinite(quantity) ||
-            quantity <= 0 ||
-            !Number.isInteger(quantity)) {
-
-            validationMessage.textContent =
-                `Please enter a valid positive Quantity for Product ${i + 1}.`;
-            return;
-        }
+        // Calculate final amount.
+        const finalAmount =
+            subtotal - discount + deliveryFee;
 
 
-        // Calculate the amount for the product.
-        const itemAmount = calculateItemAmount(price, quantity);
+        // Display complete order summary.
+        orderSummary.innerHTML = `
+            <h2>MINI STORE CHECKOUT SYSTEM</h2>
 
-
-        // Add the item amount to the subtotal accumulator.
-        subtotal += itemAmount;
-
-
-        // Build the product details.
-        productsOutput += `
             <p>
-                <strong>${i + 1}. ${productName}</strong><br>
-                Price: ₱${price.toFixed(2)}<br>
-                Quantity: ${quantity}<br>
-                Amount: ₱${itemAmount.toFixed(2)}
+                <strong>Customer:</strong> ${customerName}
+            </p>
+
+            ${productsOutput}
+
+            <h3>ORDER SUMMARY</h3>
+
+            <p>
+                Subtotal: ₱${subtotal.toFixed(2)}<br>
+                Discount Rate: ${discountRate}%<br>
+                Discount Amount: ₱${discount.toFixed(2)}<br>
+                Delivery Type: ${deliveryType}<br>
+                Delivery Fee: ₱${deliveryFee.toFixed(2)}<br>
+                <strong>Final Amount: ₱${finalAmount.toFixed(2)}</strong>
             </p>
         `;
-    }
-
-
-    // Calculate the discount.
-    const discount = calculateDiscount(subtotal);
-
-
-    // Determine the discount rate for display.
-    let discountRate;
-
-    if (subtotal >= 5000) {
-        discountRate = 10;
-    } else if (subtotal >= 3000) {
-        discountRate = 7;
-    } else if (subtotal >= 1000) {
-        discountRate = 5;
-    } else {
-        discountRate = 0;
-    }
-
-
-    // Calculate the delivery fee.
-    const deliveryFee = getDeliveryFee(deliveryOption);
-
-
-    // Determine the delivery type for the order summary.
-    let deliveryType;
-
-    if (deliveryOption === "1") {
-        deliveryType = "Store Pickup";
-    } else if (deliveryOption === "2") {
-        deliveryType = "Standard Delivery";
-    } else {
-        deliveryType = "Express Delivery";
-    }
-
-
-    // Calculate the final amount.
-    const finalAmount = subtotal - discount + deliveryFee;
-
-
-    // Display the complete order summary.
-    orderSummary.innerHTML = `
-        <h2>MINI STORE CHECKOUT SYSTEM</h2>
-
-        <p>
-            <strong>Customer:</strong> ${customerName}
-        </p>
-
-        ${productsOutput}
-
-        <h3>ORDER SUMMARY</h3>
-
-        <p>
-            Subtotal: ₱${subtotal.toFixed(2)}<br>
-            Discount Rate: ${discountRate}%<br>
-            Discount Amount: ₱${discount.toFixed(2)}<br>
-            Delivery Type: ${deliveryType}<br>
-            Delivery Fee: ₱${deliveryFee.toFixed(2)}<br>
-            <strong>Final Amount: ₱${finalAmount.toFixed(2)}</strong>
-        </p>
-    `;
-});
+    });
+}
