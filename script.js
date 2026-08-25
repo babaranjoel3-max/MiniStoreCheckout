@@ -1,9 +1,10 @@
-// Calculate the amount for one product
+// Required function 1
 function calculateItemAmount(price, quantity) {
     return price * quantity;
 }
 
-// Calculate the discount amount based on the subtotal
+
+// Required function 2
 function calculateDiscount(subtotal) {
     let discountRate;
 
@@ -20,7 +21,8 @@ function calculateDiscount(subtotal) {
     return subtotal * discountRate;
 }
 
-// Determine the delivery fee using a switch statement
+
+// Required function 3
 function getDeliveryFee(option) {
     let fee;
 
@@ -44,58 +46,50 @@ function getDeliveryFee(option) {
     return fee;
 }
 
-// Get the required elements from the HTML
+
+// Get HTML elements
 const productCountInput = document.getElementById("productCount");
 const productsContainer = document.getElementById("productsContainer");
-const calculateBtn = document.getElementById("calculateBtn");
 
-// Generate product input fields
+
+// Generate product inputs using a for loop
 productCountInput.addEventListener("input", function () {
+
     const productCount = Number(productCountInput.value);
 
     productsContainer.innerHTML = "";
 
-    if (productCount > 0) {
+    if (productCount > 0 && Number.isInteger(productCount)) {
+
         for (let i = 0; i < productCount; i++) {
 
-            const productDiv = document.createElement("div");
-            productDiv.className = "product";
+            productsContainer.innerHTML += `
+                <div>
+                    <h3>Product ${i + 1}</h3>
 
-            productDiv.innerHTML = `
-                <h3>Product ${i + 1}</h3>
+                    <label for="productName-${i}">Product Name</label>
+                    <input type="text" id="productName-${i}">
 
-                <label for="productName-${i}">Product Name</label>
-                <input
-                    type="text"
-                    id="productName-${i}"
-                    placeholder="Enter product name"
-                >
+                    <br>
 
-                <label for="productPrice-${i}">Price</label>
-                <input
-                    type="number"
-                    id="productPrice-${i}"
-                    min="0"
-                    step="0.01"
-                    placeholder="Enter price"
-                >
+                    <label for="productPrice-${i}">Price</label>
+                    <input type="number" id="productPrice-${i}" step="0.01">
 
-                <label for="productQuantity-${i}">Quantity</label>
-                <input
-                    type="number"
-                    id="productQuantity-${i}"
-                    min="1"
-                    placeholder="Enter quantity"
-                >
+                    <br>
+
+                    <label for="productQuantity-${i}">Quantity</label>
+                    <input type="number" id="productQuantity-${i}">
+
+                    <br><br>
+                </div>
             `;
-
-            productsContainer.appendChild(productDiv);
         }
     }
 });
 
-// Calculate the order
-calculateBtn.addEventListener("click", function () {
+
+// Calculate order when button is clicked
+document.getElementById("calculateBtn").addEventListener("click", function () {
 
     const customerName = document.getElementById("customerName").value.trim();
     const productCount = Number(productCountInput.value);
@@ -104,8 +98,10 @@ calculateBtn.addEventListener("click", function () {
     const validationMessage = document.getElementById("validationMessage");
     const orderSummary = document.getElementById("orderSummary");
 
+    // Clear previous messages
     validationMessage.textContent = "";
     orderSummary.innerHTML = "";
+
 
     // Validate customer name
     if (customerName === "") {
@@ -113,61 +109,75 @@ calculateBtn.addEventListener("click", function () {
         return;
     }
 
+
     // Validate product count
-    if (!Number.isFinite(productCount) || productCount <= 0 || !Number.isInteger(productCount)) {
-        validationMessage.textContent = "Please enter a valid positive whole number for Number of Products.";
+    if (!Number.isInteger(productCount) || productCount <= 0) {
+        validationMessage.textContent = "Please enter a valid positive Number of Products.";
         return;
     }
 
-    let subtotal = 0;
-    let productDetails = "";
 
-    // Process each product using a for loop
+    let subtotal = 0;
+    let productsOutput = "";
+
+
+    // Process products using the required for loop
     for (let i = 0; i < productCount; i++) {
 
         const productName = document.getElementById(`productName-${i}`).value.trim();
         const price = Number(document.getElementById(`productPrice-${i}`).value);
         const quantity = Number(document.getElementById(`productQuantity-${i}`).value);
 
+
         // Validate product name
         if (productName === "") {
-            validationMessage.textContent = `Please enter the Product Name for Product ${i + 1}.`;
+            validationMessage.textContent =
+                `Please enter the Product Name for Product ${i + 1}.`;
             return;
         }
+
 
         // Validate price
         if (!Number.isFinite(price) || price <= 0) {
-            validationMessage.textContent = `Please enter a valid positive Price for Product ${i + 1}.`;
+            validationMessage.textContent =
+                `Please enter a valid positive Price for Product ${i + 1}.`;
             return;
         }
 
+
         // Validate quantity
         if (!Number.isFinite(quantity) || quantity <= 0 || !Number.isInteger(quantity)) {
-            validationMessage.textContent = `Please enter a valid positive whole number for Quantity of Product ${i + 1}.`;
+            validationMessage.textContent =
+                `Please enter a valid positive Quantity for Product ${i + 1}.`;
             return;
         }
+
 
         // Calculate item amount
         const itemAmount = calculateItemAmount(price, quantity);
 
-        // Add item amount to subtotal accumulator
+
+        // Accumulator
         subtotal += itemAmount;
 
-        // Build product details
-        productDetails += `
-            <div>
+
+        // Build product output
+        productsOutput += `
+            <p>
                 <strong>${i + 1}. ${productName}</strong><br>
-                &nbsp;&nbsp;&nbsp;Price: ₱${price.toFixed(2)}<br>
-                &nbsp;&nbsp;&nbsp;Quantity: ${quantity}<br>
-                &nbsp;&nbsp;&nbsp;Amount: ₱${itemAmount.toFixed(2)}
-            </div>
-            <br>
+                Price: ₱${price.toFixed(2)}<br>
+                Quantity: ${quantity}<br>
+                Amount: ₱${itemAmount.toFixed(2)}
+            </p>
         `;
     }
+
 
     // Calculate discount
     const discount = calculateDiscount(subtotal);
 
+
+    // Determine discount rate for display
     let discountRate;
 
     if (subtotal >= 5000) {
@@ -180,9 +190,12 @@ calculateBtn.addEventListener("click", function () {
         discountRate = 0;
     }
 
+
     // Calculate delivery fee
     const deliveryFee = getDeliveryFee(deliveryOption);
 
+
+    // Determine delivery type
     let deliveryType;
 
     switch (deliveryOption) {
@@ -202,22 +215,22 @@ calculateBtn.addEventListener("click", function () {
             deliveryType = "Store Pickup";
     }
 
-    // Calculate final amount
+
+    // Final amount
     const finalAmount = subtotal - discount + deliveryFee;
+
 
     // Display complete order summary
     orderSummary.innerHTML = `
-        <div class="summary-title">MINI STORE CHECKOUT SYSTEM</div>
+        <h2>MINI STORE CHECKOUT SYSTEM</h2>
 
         <p>
             <strong>Customer:</strong> ${customerName}
         </p>
 
-        ${productDetails}
+        ${productsOutput}
 
-        <hr>
-
-        <div class="summary-title">ORDER SUMMARY</div>
+        <h3>ORDER SUMMARY</h3>
 
         <p>
             Subtotal: ₱${subtotal.toFixed(2)}<br>
